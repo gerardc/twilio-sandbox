@@ -5,11 +5,11 @@ module CurrentCall
 
   class << self
     def sid
-      IO.read("tmp/current_call").chomp rescue ""
+      IO.read("current_call").chomp rescue ""
     end
 
     def sid=(call_sid)
-      IO.write("tmp/current_call", call_sid)
+      IO.write("current_call", call_sid)
     end
   end
 
