@@ -3,7 +3,7 @@ twilio-sandbox
 
 Simple Sinatra application for prototyping Twilio workflows.
 
-## Getting Started
+### Getting Started
 
 1. Copy `twilio.yml.sample` to `twilio.yml` and add your account settings
 2. Run `proxylocal 9393` to allow Twilio to reach your app
