@@ -14,10 +14,10 @@ Simple Sinatra application for prototyping Twilio workflows.
 
 ### Commands
 
-`curl http://<your_unique_id>.proxylocal.com/run/dial_client/your_client_name
-curl http://<your_unique_id>.proxylocal.com/run/enqueue
-curl http://<your_unique_id>.proxylocal.com/run/dial_number/+123456789
-curl http://<your_unique_id>.proxylocal.com/run/enqueue
-curl http://<your_unique_id>.proxylocal.com/run/dial_client
-curl http://<your_unique_id>.proxylocal.com/run/say_hello`
+`curl http://<your_unique_id>.proxylocal.com/run/dial_client/your_client_name`
+`curl http://<your_unique_id>.proxylocal.com/run/enqueue`
+`curl http://<your_unique_id>.proxylocal.com/run/dial_number/+123456789`
+`curl http://<your_unique_id>.proxylocal.com/run/enqueue`
+`curl http://<your_unique_id>.proxylocal.com/run/dial_client`
+`curl http://<your_unique_id>.proxylocal.com/run/say_hello`
 
