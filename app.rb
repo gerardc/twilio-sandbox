@@ -2,15 +2,23 @@ require 'twilio-ruby'
 require 'sinatra'
 
 module CurrentCall
+  # Store current call id in tmp file. Allows for app_reloading with `rerun`
+  # or `shotgun` in development
 
   class << self
     def sid
-      IO.read("tmp/current_call").chomp rescue ""
+      IO.read(path).chomp if File.exists?(path)
     end
 
     def sid=(call_sid)
-      IO.write("tmp/current_call", call_sid)
+      IO.write(path, call_sid)
     end
+
+    private
+
+      def path
+        "tmp/current_call"
+      end
   end
 
 end
@@ -19,8 +27,9 @@ class App < Sinatra::Base
 
   configure do
     enable :logging
-    set :account_sid, ENV["ACCOUNT_SID"]
-    set :auth_token, ENV["AUTH_TOKEN"]
+    set :twilio_config, YAML.load_file("twilio.yml")
+    set :account_sid, (ENV["ACCOUNT_SID"] || twilio_config["account_sid"])
+    set :auth_token, (ENV["AUTH_TOKEN"] || twilio_config["auth_token"])
     set :queue_name, "queue_name"
   end
 

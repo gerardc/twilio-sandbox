@@ -2,9 +2,11 @@ require "bundler/setup"
 require "twilio-ruby"
 
 task :config_twilio do
-  account_sid = ENV["ACCOUNT_SID"]
-  auth_token = ENV["AUTH_TOKEN"]
-  phone_sid = ENV["PHONE_SID"]
+  twilio_config = YAML.load_file("twilio.yml")
+
+  account_sid = (ENV["ACCOUNT_SID"] || twilio_config["account_sid"])
+  auth_token = (ENV["AUTH_TOKEN"] || twilio_config["auth_token"])
+  phone_sid = (ENV["PHONE_SID"] || twilio_config["phone_sid"])
   url = ENV["URL"] + "/voice"
 
   @client = Twilio::REST::Client.new account_sid, auth_token
