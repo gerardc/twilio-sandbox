@@ -21,3 +21,11 @@ Simple Sinatra application for prototyping Twilio workflows.
 `curl http://<your_unique_id>.proxylocal.com/run/dial_client`   
 `curl http://<your_unique_id>.proxylocal.com/run/say_hello`
 
+### Adding Commands
+
+Simply follow the convention in `app.rb`!
+
+### TODO
+
+- Add conference workflow
+
