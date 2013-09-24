@@ -12,6 +12,6 @@ task :config_twilio do
   @client = Twilio::REST::Client.new account_sid, auth_token
   @number = @client.account.incoming_phone_numbers.get(phone_sid)
 
-  puts "Updating #{phone_sid} to point to: #{url}"
+  puts "Updating #{phone_sid} (#{@number.phone_number}) to point to: #{url}"
   @number.update(:voice_url => url)
 end
