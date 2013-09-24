@@ -7,7 +7,7 @@ Simple Sinatra application for prototyping Twilio workflows.
 
 1. Copy `twilio.yml.sample` to `twilio.yml` and add your account settings
 2. Run `proxylocal 9393` to allow Twilio to reach your app
-3. Run `URL=http://<your_unique_id>.proxylocal.com rake config` to configure Twilio to hit your `/voice` route
+3. Run `URL=http://<your_unique_id>.proxylocal.com rake config_twilio` to configure Twilio to hit your `/voice` route
 4. Run `shotgun` or `rerun 'rackup -p 9393'` - to start a reloading local app
 5. Open your app at `/your_client_name`
 5. Dial your number and try some of the commands below
