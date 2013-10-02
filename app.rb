@@ -1,5 +1,6 @@
 require 'twilio-ruby'
 require 'sinatra'
+require 'yaml'
 
 module CurrentCall
   # Store current call id in tmp file. Allows for app_reloading with `rerun`
