@@ -1,3 +1,4 @@
 account_sid: YOUR_ACCOUNT_SID
 auth_token: YOUR_AUTH_TOKEN
 phone_sid: YOUR_PHONE_SID
+phone_number: YOUR_PHONE_NUMBER
