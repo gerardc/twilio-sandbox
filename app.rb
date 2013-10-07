@@ -11,7 +11,7 @@ class CurrentCall
     end
 
     def sid=(call_sid)
-      File.open(path, 'a+') {|f| f.write(call_sid) }
+      File.open(path, 'w') {|f| f.write(call_sid) }
     end
 
     private
