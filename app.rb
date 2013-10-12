@@ -1,26 +1,32 @@
 require 'twilio-ruby'
 require 'sinatra'
+require 'yaml'
 
-module CurrentCall
+class CurrentCall
   # Store current call id in tmp file. Allows for app_reloading with `rerun`
   # or `shotgun` in development
-
   class << self
     def sid
-      IO.read(path).chomp if File.exists?(path)
+      File.open(path, "r").read.chomp if File.exists?(path)
     end
 
     def sid=(call_sid)
-      IO.write(path, call_sid)
+      File.open(path, 'w') {|f| f.write(call_sid) }
     end
 
     private
 
-      def path
-        "tmp/current_call"
-      end
+    def path
+      "tmp/current_call"
+    end
   end
 
+end
+
+class AgentCall < CurrentCall
+  def self.path
+    "tmp/agent_call"
+  end
 end
 
 class App < Sinatra::Base
@@ -30,7 +36,10 @@ class App < Sinatra::Base
     set :twilio_config, YAML.load_file("twilio.yml")
     set :account_sid, (ENV["ACCOUNT_SID"] || twilio_config["account_sid"])
     set :auth_token, (ENV["AUTH_TOKEN"] || twilio_config["auth_token"])
+    set :phone_number, (ENV["PHONE_NUMBER"] || twilio_config["phone_number"])
     set :queue_name, "queue_name"
+    set :hold_queue_name, "hold_queue_name"
+    set :conference_name, "fighting_mongooses_conf"
   end
 
   before do
@@ -42,10 +51,10 @@ class App < Sinatra::Base
     logger.info "response.body: #{response.body}"
   end
 
-  get '/:client_name' do
+  get '/agent_client' do
     capability = Twilio::Util::Capability.new settings.account_sid, settings.auth_token
 
-    capability.allow_client_incoming params[:client_name]
+    capability.allow_client_incoming 'agent_client'
     token = capability.generate
     erb :index, :locals => {:token => token}
   end
@@ -72,6 +81,7 @@ class App < Sinatra::Base
     client = ::Twilio::REST::Client.new settings.account_sid, settings.auth_token
     call = client.account.calls.get(CurrentCall.sid)
     url = url("#{params[:splat].first}")
+    p params[:splat]
     call.update(:url => url, :method => "POST")
   end
 
@@ -108,4 +118,73 @@ class App < Sinatra::Base
     response.text
   end
 
+  post '/hangup_all' do
+    calls = twilio_client.account.calls.list({:status => "in-progress"})
+
+    calls.each do |call|
+        call.hangup()
+    end
+  end
+
+  ## CONFERENCE
+
+  post '/put_caller_in_conference' do
+    call = twilio_client.account.calls.get(CurrentCall.sid)
+    call.update(:url => url("go_to_conference"), :method => "POST")
+  end
+
+  post '/put_agent_in_conference' do
+    call = twilio_client.account.calls.get(AgentCall.sid)
+    call.update(:url => url("go_to_conference"), :method => "POST")
+  end
+
+  post '/dial_agent' do
+    agent_call = twilio_client.account.calls.create(
+      :from => settings.phone_number,
+      :to => "client:agent_client",
+      :url => url('go_to_conference') # direct call to conference immediately
+    )
+
+    AgentCall.sid = agent_call.sid
+  end
+
+  post '/go_to_conference' do
+    response = Twilio::TwiML::Response.new do |r|
+      r.Dial do |d|
+        d.Conference settings.conference_name, :waitUrl => 'http://twimlets.com/holdmusic?Bucket=com.twilio.music.electronica'
+      end
+    end
+    response.text
+  end
+
+  ### CALL HOLD
+
+  post '/put_agent_on_hold' do
+    agent_call = twilio_client.account.calls.get(AgentCall.sid)
+    agent_call.update(:url => url("hold/agent"), :method => "POST")
+  end
+
+  post '/put_caller_on_hold' do
+    agent_call = twilio_client.account.calls.get(CurrentCall.sid)
+    agent_call.update(:url => url("hold/caller"), :method => "POST")
+  end
+
+  post '/hold/:role' do
+    response = Twilio::TwiML::Response.new do |r|
+      if params[:role] == 'agent'
+        r.Say "You are an agent on hold!"
+        r.Play "https://api.twilio.com/cowbell.mp3", :loop => 100
+      else
+        r.Say "Placing you on hold. Please wait."
+        r.Play "http://s1download-universal-soundbank.com/mp3/sounds/3040.mp3", :loop => 100 # Hiccup
+      end
+    end
+    response.text
+  end
+
+  helpers do
+    def twilio_client
+      @twilio_client ||= ::Twilio::REST::Client.new settings.account_sid, settings.auth_token
+    end
+  end
 end

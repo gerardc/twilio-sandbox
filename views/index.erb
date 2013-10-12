@@ -62,21 +62,21 @@
 
     /* Let us know when the client is ready. */
     Twilio.Device.ready(function (device) {
-        $("#log").text("Ready");
+      $("#log").text("Ready");
     });
 
     /* Report any errors on the screen */
     Twilio.Device.error(function (error) {
-        $("#log").text("Error: " + error.message);
+      $("#log").text("Error: " + error.message);
     });
 
     /* Log a message when a call disconnects. */
     Twilio.Device.disconnect(function (conn) {
-        $("#log").text("Call ended");
+      $("#log").text("Call ended");
     });
 
     Twilio.Device.connect(function (conn) {
-        $("#log").append("<br />Successfully established call");
+      $("#log").append("<br />Successfully established call");
     });
 
     /* Listen for incoming connections */
@@ -88,13 +88,13 @@
 
     /* Connect to Twilio when we call this function. */
     function call() {
-        Twilio.Device.connect();
+      Twilio.Device.connect();
     }
 
     /* A function to end a connection to Twilio. */
     function hangup() {
-        Twilio.Device.disconnectAll();
-    }
+      Twilio.Device.disconnectAll();
+    };
     </script>
 
   </head>
